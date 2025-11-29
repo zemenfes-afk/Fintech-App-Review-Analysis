@@ -1,0 +1,20 @@
+# Task 1: Scraping and Preprocessing
+google-play-scraper
+pandas
+numpy
+
+# Task 2: Sentiment and Thematic Analysis
+transformers
+torch # required for transformers
+scikit-learn
+spacy
+nltk
+vaderSentiment
+TextBlob # for comparison, if time permits
+
+# Task 3: Database
+psycopg2-binary # Python adapter for PostgreSQL
+
+# Task 4: Visualization
+matplotlib
+seaborn
