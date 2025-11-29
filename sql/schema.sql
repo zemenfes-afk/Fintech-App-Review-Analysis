@@ -36,29 +36,3 @@ INSERT INTO banks (bank_name, app_name) VALUES
 ('Commercial Bank of Ethiopia', 'com.combanketh.mobilebanking'),
 ('Bank of Abyssinia', 'com.boa.boaMobileBanking'),
 ('Dashen Bank', 'com.dashen.dashensuperapp');
-```
-eof
-
-#### Step 2: Configure Database Credentials
-
-Ensure your **`config.py`** file (in your project root) has the correct connection details for your local PostgreSQL installation:
-
-```python
-# config.py
-
-# PostgreSQL Database Credentials
-DB_CONFIG = {
-    "dbname": "bank_reviews", # Make sure you created a DB with this name
-    "user": "your_postgres_user", # <<< UPDATE THIS >>>
-    "password": "your_postgres_password", # <<< UPDATE THIS >>>
-    "host": "localhost",
-    "port": "5432"
-}
-```
-
-#### Step 3: Run the Ingestion Script
-
-Now, run the Python script to connect to the DB and insert the data from `data/analyzed_reviews.csv`.
-
-```bash
-python C:\Users\HP\PycharmProjects\Fintech_App_Review_Analysis\src\T3_database_ingestion.py

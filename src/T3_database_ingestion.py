@@ -1,7 +1,7 @@
 import pandas as pd
 import psycopg2
 import os
-from config import DB_CONFIG  # Assumes config.py is in the root directory
+from config import DB_CONFIG
 
 # --- Configuration ---
 INPUT_FILE = os.path.join('data', 'analyzed_reviews.csv')
@@ -22,9 +22,9 @@ def insert_reviews_data(conn, df):
     """Inserts processed reviews into the reviews table."""
     cursor = conn.cursor()
 
-    # 1. Fetch bank IDs
+    # 1. Fetch bank IDs - CRITICAL FIX: Use 'public.banks'
     bank_ids = {}
-    cursor.execute("SELECT bank_name, bank_id FROM banks;")
+    cursor.execute("SELECT bank_name, bank_id FROM public.banks;")
     for name, id in cursor.fetchall():
         bank_ids[name] = id
 
@@ -33,15 +33,14 @@ def insert_reviews_data(conn, df):
         return
 
     # 2. Prepare data for insertion
-    # Ensure bank names are mapped correctly to bank_id using the dictionary
-    df['bank_id'] = df['bank'].map(bank_ids).astype('Int64')  # Use Int64 for nullable integer
+    df['bank_id'] = df['bank'].map(bank_ids).astype('Int64')
 
     # Filter out reviews where the bank name didn't match an ID
     df_to_insert = df.dropna(subset=['bank_id'])
 
-    # SQL INSERT statement
+    # SQL INSERT statement - CRITICAL FIX: Use 'public.reviews'
     insert_query = """
-    INSERT INTO reviews (
+    INSERT INTO public.reviews (
         review_id, bank_id, review_text, rating, review_date, 
         sentiment_label, sentiment_score, normalized_sentiment, final_sentiment, identified_theme, source
     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -81,22 +80,22 @@ def verify_data_integrity(conn):
     cursor = conn.cursor()
     print("\n--- Data Verification Queries ---")
 
-    # Query 1: Count reviews per bank
+    # Query 1: Count reviews per bank - CRITICAL FIX: Use 'public.banks'/'public.reviews'
     cursor.execute("""
         SELECT b.bank_name, COUNT(r.review_id) AS review_count
-        FROM reviews r
-        JOIN banks b ON r.bank_id = b.bank_id
+        FROM public.reviews r
+        JOIN public.banks b ON r.bank_id = b.bank_id
         GROUP BY b.bank_name;
     """)
     print("Reviews per Bank:")
     for row in cursor.fetchall():
         print(f"  {row[0]}: {row[1]} reviews")
 
-    # Query 2: Average rating per bank
+    # Query 2: Average rating per bank - CRITICAL FIX: Use 'public.banks'/'public.reviews'
     cursor.execute("""
         SELECT b.bank_name, ROUND(AVG(r.rating)::numeric, 2) AS avg_rating
-        FROM reviews r
-        JOIN banks b ON r.bank_id = b.bank_id
+        FROM public.reviews r
+        JOIN public.banks b ON r.bank_id = b.bank_id
         GROUP BY b.bank_name;
     """)
     print("Average Rating per Bank:")
